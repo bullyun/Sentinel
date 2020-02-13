@@ -26,8 +26,10 @@ import org.apache.dubbo.rpc.Invoker;
 public final class DubboUtils {
 
     public static final String SENTINEL_DUBBO_APPLICATION_KEY = "dubboApplication";
-    public static final String DUBBO_METHOD_ENTRY_KEY = "dubboMethodEntry";
-    public static final String DUBBO_INTERFACE_ENTRY_KEY = "dubboInterfaceEntry";
+    public static final String DUBBO_PROVIDER_METHOD_ENTRY_KEY = "dubboProviderMethodEntry";
+    public static final String DUBBO_PROVIDER_INTERFACE_ENTRY_KEY = "dubboProviderInterfaceEntry";
+    public static final String DUBBO_CONSUMER_METHOD_ENTRY_KEY = "dubboConsumerMethodEntry";
+    public static final String DUBBO_CONSUMER_INTERFACE_ENTRY_KEY = "dubboConsumerInterfaceEntry";
 
     public static String getApplication(Invocation invocation, String defaultValue) {
         if (invocation == null || invocation.getAttachments() == null) {

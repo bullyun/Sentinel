@@ -22,11 +22,7 @@ import com.alibaba.csp.sentinel.adapter.dubbo.config.DubboConfig;
 import com.alibaba.csp.sentinel.context.ContextUtil;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.constants.CommonConstants;
-import org.apache.dubbo.rpc.Invocation;
-import org.apache.dubbo.rpc.Invoker;
-import org.apache.dubbo.rpc.ListenableFilter;
-import org.apache.dubbo.rpc.Result;
-import org.apache.dubbo.rpc.RpcContext;
+import org.apache.dubbo.rpc.*;
 
 /**
  * Base Class of the {@link SentinelDubboProviderFilter} and {@link SentinelDubboConsumerFilter}.
@@ -34,44 +30,39 @@ import org.apache.dubbo.rpc.RpcContext;
  * @author Zechao Zheng
  */
 
-public abstract class BaseSentinelDubboFilter extends ListenableFilter {
-    public BaseSentinelDubboFilter() {
-        this.listener = new SentinelDubboListener();
-    }
+public abstract class BaseSentinelDubboFilter implements Filter, Filter.Listener {
 
-    static class SentinelDubboListener implements Listener {
-
-        @Override
-        public void onResponse(Result appResponse, Invoker<?> invoker, Invocation invocation) {
-            if (DubboConfig.getDubboBizExceptionTraceEnabled()) {
-                traceAndExit(appResponse.getException(), invoker.getUrl());
-            } else {
-                traceAndExit(null, invoker.getUrl());
-            }
-        }
-
-        @Override
-        public void onError(Throwable t, Invoker<?> invoker, Invocation invocation) {
-            traceAndExit(t, invoker.getUrl());
-        }
-
-    }
-
-    static void traceAndExit(Throwable throwable, URL url) {
-        Entry interfaceEntry = (Entry) RpcContext.getContext().get(DubboUtils.DUBBO_INTERFACE_ENTRY_KEY);
-        Entry methodEntry = (Entry) RpcContext.getContext().get(DubboUtils.DUBBO_METHOD_ENTRY_KEY);
-        if (methodEntry != null) {
-            Tracer.traceEntry(throwable, methodEntry);
-            methodEntry.exit();
-            RpcContext.getContext().remove(DubboUtils.DUBBO_METHOD_ENTRY_KEY);
-        }
-        if (interfaceEntry != null) {
-            Tracer.traceEntry(throwable, interfaceEntry);
-            interfaceEntry.exit();
-            RpcContext.getContext().remove(DubboUtils.DUBBO_INTERFACE_ENTRY_KEY);
-        }
-        if (CommonConstants.PROVIDER_SIDE.equals(url.getParameter(CommonConstants.SIDE_KEY))) {
-            ContextUtil.exit();
+    @Override
+    public void onMessage(Result appResponse, Invoker<?> invoker, Invocation invocation) {
+        if (DubboConfig.getDubboBizExceptionTraceEnabled()) {
+            traceAndExit(appResponse.getException(), invoker.getUrl());
+        } else {
+            traceAndExit(null, invoker.getUrl());
         }
     }
+
+    @Override
+    public void onError(Throwable t, Invoker<?> invoker, Invocation invocation) {
+        traceAndExit(t, invoker.getUrl());
+    }
+
+    abstract protected void traceAndExit(Throwable throwable, URL url);
+//
+//    static void traceAndExit(Throwable throwable, URL url) {
+//        Entry interfaceEntry = (Entry) RpcContext.getContext().get(DubboUtils.DUBBO_INTERFACE_ENTRY_KEY);
+//        Entry methodEntry = (Entry) RpcContext.getContext().get(DubboUtils.DUBBO_METHOD_ENTRY_KEY);
+//        if (methodEntry != null) {
+//            Tracer.traceEntry(throwable, methodEntry);
+//            methodEntry.exit();
+//            RpcContext.getContext().remove(DubboUtils.DUBBO_METHOD_ENTRY_KEY);
+//        }
+//        if (interfaceEntry != null) {
+//            Tracer.traceEntry(throwable, interfaceEntry);
+//            interfaceEntry.exit();
+//            RpcContext.getContext().remove(DubboUtils.DUBBO_INTERFACE_ENTRY_KEY);
+//        }
+//        if (CommonConstants.PROVIDER_SIDE.equals(url.getParameter(CommonConstants.SIDE_KEY))) {
+//            ContextUtil.exit();
+//        }
+//    }
 }

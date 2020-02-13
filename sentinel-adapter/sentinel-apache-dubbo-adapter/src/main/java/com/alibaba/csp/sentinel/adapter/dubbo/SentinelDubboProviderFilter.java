@@ -15,15 +15,13 @@
  */
 package com.alibaba.csp.sentinel.adapter.dubbo;
 
-import com.alibaba.csp.sentinel.Entry;
-import com.alibaba.csp.sentinel.EntryType;
-import com.alibaba.csp.sentinel.ResourceTypeConstants;
-import com.alibaba.csp.sentinel.SphU;
+import com.alibaba.csp.sentinel.*;
 import com.alibaba.csp.sentinel.adapter.dubbo.config.DubboConfig;
 import com.alibaba.csp.sentinel.adapter.dubbo.fallback.DubboFallbackRegistry;
 import com.alibaba.csp.sentinel.context.ContextUtil;
 import com.alibaba.csp.sentinel.log.RecordLog;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
+import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.extension.Activate;
 import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
@@ -61,19 +59,34 @@ public class SentinelDubboProviderFilter extends BaseSentinelDubboFilter {
             String methodResourceName = DubboUtils.getResourceName(invoker, invocation, DubboConfig.getDubboProviderPrefix());
             String interfaceResourceName = DubboConfig.getDubboInterfaceGroupAndVersionEnabled() ? invoker.getUrl().getColonSeparatedKey()
                     : invoker.getInterface().getName();
-            // Only need to create entrance context at provider side, as context will take effect
-            // at entrance of invocation chain only (for inbound traffic).
-            ContextUtil.enter(methodResourceName, application);
+            // 不然调用链会非常怪异
+            // ContextUtil.enter(methodResourceName, application);
             interfaceEntry = SphU.entry(interfaceResourceName, ResourceTypeConstants.COMMON_RPC, EntryType.IN);
-            rpcContext.set(DubboUtils.DUBBO_INTERFACE_ENTRY_KEY, interfaceEntry);
+            rpcContext.set(DubboUtils.DUBBO_PROVIDER_INTERFACE_ENTRY_KEY, interfaceEntry);
             methodEntry = SphU.entry(methodResourceName, ResourceTypeConstants.COMMON_RPC, EntryType.IN, invocation.getArguments());
-            rpcContext.set(DubboUtils.DUBBO_METHOD_ENTRY_KEY, methodEntry);
+            rpcContext.set(DubboUtils.DUBBO_PROVIDER_METHOD_ENTRY_KEY, methodEntry);
             return invoker.invoke(invocation);
         } catch (BlockException e) {
             return DubboFallbackRegistry.getProviderFallback().handle(invoker, invocation, e);
         }
     }
 
+    @Override
+    protected void traceAndExit(Throwable throwable, URL url) {
+        Entry interfaceEntry = (Entry) RpcContext.getContext().get(DubboUtils.DUBBO_PROVIDER_INTERFACE_ENTRY_KEY);
+        Entry methodEntry = (Entry) RpcContext.getContext().get(DubboUtils.DUBBO_PROVIDER_METHOD_ENTRY_KEY);
+        if (methodEntry != null) {
+            Tracer.traceEntry(throwable, methodEntry);
+            methodEntry.exit();
+            RpcContext.getContext().remove(DubboUtils.DUBBO_PROVIDER_METHOD_ENTRY_KEY);
+        }
+        if (interfaceEntry != null) {
+            Tracer.traceEntry(throwable, interfaceEntry);
+            interfaceEntry.exit();
+            RpcContext.getContext().remove(DubboUtils.DUBBO_PROVIDER_INTERFACE_ENTRY_KEY);
+        }
+        // ContextUtil.exit();
+    }
 
 }
 

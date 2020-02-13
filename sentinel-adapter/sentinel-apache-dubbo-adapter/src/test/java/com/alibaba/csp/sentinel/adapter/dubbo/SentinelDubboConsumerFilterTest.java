@@ -203,8 +203,8 @@ public class SentinelDubboConsumerFilterTest extends BaseTest {
 
         // the method of invocation should be blocked
         Result fallback = requestGo(false, invocation);
-        assertNotNull(RpcContext.getContext().get(DubboUtils.DUBBO_INTERFACE_ENTRY_KEY));
-        assertNull(RpcContext.getContext().get(DubboUtils.DUBBO_METHOD_ENTRY_KEY));
+        assertNotNull(RpcContext.getContext().get(DubboUtils.DUBBO_CONSUMER_INTERFACE_ENTRY_KEY));
+        assertNull(RpcContext.getContext().get(DubboUtils.DUBBO_CONSUMER_METHOD_ENTRY_KEY));
         responseBack(fallback);
         assertEquals("fallback", fallback.getValue());
         verifyInvocationStructureForCallFinish();
@@ -225,7 +225,7 @@ public class SentinelDubboConsumerFilterTest extends BaseTest {
     }
 
     public Result responseBack(Result result) {
-        filter.listener().onResponse(result, invoker, invocation);
+        filter.onMessage(result, invoker, invocation);
         return result;
     }
 
@@ -263,7 +263,7 @@ public class SentinelDubboConsumerFilterTest extends BaseTest {
         filter.invoke(invoker, invocation);
         verify(invoker).invoke(invocation);
 
-        filter.listener().onResponse(result, invoker, invocation);
+        filter.onMessage(result, invoker, invocation);
         Context context = ContextUtil.getContext();
         assertNull(context);
     }
@@ -380,8 +380,8 @@ public class SentinelDubboConsumerFilterTest extends BaseTest {
     private void verifyInvocationStructureForCallFinish() {
         Context context = ContextUtil.getContext();
         assertNull(context);
-        Entry interfaceEntry = (Entry) RpcContext.getContext().get(DubboUtils.DUBBO_INTERFACE_ENTRY_KEY);
-        Entry methodEntry = (Entry) RpcContext.getContext().get(DubboUtils.DUBBO_METHOD_ENTRY_KEY);
+        Entry interfaceEntry = (Entry) RpcContext.getContext().get(DubboUtils.DUBBO_CONSUMER_INTERFACE_ENTRY_KEY);
+        Entry methodEntry = (Entry) RpcContext.getContext().get(DubboUtils.DUBBO_CONSUMER_METHOD_ENTRY_KEY);
         assertNull(interfaceEntry);
         assertNull(methodEntry);
     }
