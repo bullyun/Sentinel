@@ -24,6 +24,7 @@ import com.ctrip.framework.apollo.openapi.client.ApolloOpenApiClient;
 import com.ctrip.framework.apollo.openapi.dto.NamespaceReleaseDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenItemDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -31,9 +32,25 @@ import java.util.List;
 /**
  * @author hantianwei@gmail.com
  * @since 1.5.0
+ * @updater yangrusheng@bullyun.com
  */
 @Component("flowRuleApolloPublisher")
 public class FlowRuleApolloPublisher implements DynamicRulePublisher<List<FlowRuleEntity>> {
+
+    @Value("${apollo.sentinel.appId:sentinel-dashboard}")
+    private String sentinelAppId;
+
+    @Value("${apollo.sentinel.operator:apollo}")
+    private String sentinelOperator;
+
+    @Value("${apollo.sentinel.env:DEV}")
+    private String sentinelEnv;
+
+    @Value("${apollo.sentinel.cluster:default}")
+    private String sentinelCluster;
+
+    @Value("${apollo.sentinel.namespace:application}")
+    private String sentinelNamespace;
 
     @Autowired
     private ApolloOpenApiClient apolloOpenApiClient;
@@ -48,21 +65,20 @@ public class FlowRuleApolloPublisher implements DynamicRulePublisher<List<FlowRu
         }
 
         // Increase the configuration
-        String appId = "appId";
         String flowDataId = ApolloConfigUtil.getFlowDataId(app);
         OpenItemDTO openItemDTO = new OpenItemDTO();
         openItemDTO.setKey(flowDataId);
         openItemDTO.setValue(converter.convert(rules));
         openItemDTO.setComment("Program auto-join");
-        openItemDTO.setDataChangeCreatedBy("some-operator");
-        apolloOpenApiClient.createOrUpdateItem(appId, "DEV", "default", "application", openItemDTO);
+        openItemDTO.setDataChangeCreatedBy(sentinelOperator);
+        apolloOpenApiClient.createOrUpdateItem(sentinelAppId, sentinelEnv, sentinelCluster, sentinelNamespace, openItemDTO);
 
         // Release configuration
         NamespaceReleaseDTO namespaceReleaseDTO = new NamespaceReleaseDTO();
         namespaceReleaseDTO.setEmergencyPublish(true);
         namespaceReleaseDTO.setReleaseComment("Modify or add configurations");
-        namespaceReleaseDTO.setReleasedBy("some-operator");
+        namespaceReleaseDTO.setReleasedBy(sentinelOperator);
         namespaceReleaseDTO.setReleaseTitle("Modify or add configurations");
-        apolloOpenApiClient.publishNamespace(appId, "DEV", "default", "application", namespaceReleaseDTO);
+        apolloOpenApiClient.publishNamespace(sentinelAppId, sentinelEnv, sentinelCluster, sentinelNamespace, namespaceReleaseDTO);
     }
 }

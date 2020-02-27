@@ -24,6 +24,7 @@ import com.ctrip.framework.apollo.openapi.client.ApolloOpenApiClient;
 import com.ctrip.framework.apollo.openapi.dto.OpenItemDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenNamespaceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -32,9 +33,22 @@ import java.util.List;
 /**
  * @author hantianwei@gmail.com
  * @since 1.5.0
+ * @updater yangrusheng@bullyun.com
  */
 @Component("flowRuleApolloProvider")
 public class FlowRuleApolloProvider implements DynamicRuleProvider<List<FlowRuleEntity>> {
+
+    @Value("${apollo.sentinel.appId:sentinel-dashboard}")
+    private String sentinelAppId;
+
+    @Value("${apollo.sentinel.env:DEV}")
+    private String sentinelEnv;
+
+    @Value("${apollo.sentinel.cluster:default}")
+    private String sentinelCluster;
+
+    @Value("${apollo.sentinel.namespace:application}")
+    private String sentinelNamespace;
 
     @Autowired
     private ApolloOpenApiClient apolloOpenApiClient;
@@ -43,9 +57,8 @@ public class FlowRuleApolloProvider implements DynamicRuleProvider<List<FlowRule
 
     @Override
     public List<FlowRuleEntity> getRules(String appName) throws Exception {
-        String appId = "appId";
         String flowDataId = ApolloConfigUtil.getFlowDataId(appName);
-        OpenNamespaceDTO openNamespaceDTO = apolloOpenApiClient.getNamespace(appId, "DEV", "default", "application");
+        OpenNamespaceDTO openNamespaceDTO = apolloOpenApiClient.getNamespace(sentinelAppId, sentinelEnv, sentinelCluster, sentinelNamespace);
         String rules = openNamespaceDTO
             .getItems()
             .stream()

@@ -32,11 +32,14 @@ import java.util.List;
 @Configuration
 public class ApolloConfig {
 
-    @Value("${apollo.ip:localhost}")
-    private String apolloIp;
+    @Value("${apollo.portal.ip:localhost}")
+    private String apolloPortalIp;
 
-    @Value("${apollo.port:10034}")
-    private String apolloPort;
+    @Value("${apollo.portal.port:10034}")
+    private String apolloPortalPort;
+
+    @Value("${apollo.portal.token:token}")
+    private String apolloPortalToken;
 
     @Bean
     public Converter<List<FlowRuleEntity>, String> flowRuleEntityEncoder() {
@@ -51,8 +54,8 @@ public class ApolloConfig {
     @Bean
     public ApolloOpenApiClient apolloOpenApiClient() {
         ApolloOpenApiClient client = ApolloOpenApiClient.newBuilder()
-            .withPortalUrl("http://" + apolloIp + ":" + apolloPort)
-            .withToken("token")
+            .withPortalUrl("http://" + apolloPortalIp + ":" + apolloPortalPort)
+            .withToken(apolloPortalToken)
             .build();
         return client;
 
