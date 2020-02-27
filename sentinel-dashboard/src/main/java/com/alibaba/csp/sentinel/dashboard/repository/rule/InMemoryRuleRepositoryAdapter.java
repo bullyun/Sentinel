@@ -71,6 +71,10 @@ public abstract class InMemoryRuleRepositoryAdapter<T extends RuleEntity> implem
         for (T rule : rules) {
             savedRules.add(save(rule));
         }
+        //持久化第三方配置中心后，子类中的 ids 应该设置为最后一个规则的ID，而不是从 0 开始。
+        if (rules.size() > 0) {
+            setId(rules.get(rules.size() - 1).getId());
+        }
         return savedRules;
     }
 
@@ -126,4 +130,6 @@ public abstract class InMemoryRuleRepositoryAdapter<T extends RuleEntity> implem
      * @return next unused id
      */
     abstract protected long nextId();
+
+    abstract protected void setId(Long id);
 }

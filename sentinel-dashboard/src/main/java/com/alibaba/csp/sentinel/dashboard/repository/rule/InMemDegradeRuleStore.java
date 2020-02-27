@@ -33,4 +33,9 @@ public class InMemDegradeRuleStore extends InMemoryRuleRepositoryAdapter<Degrade
     protected long nextId() {
         return ids.incrementAndGet();
     }
+
+    @Override
+    protected void setId(Long id) {
+        ids.set(id);
+    }
 }

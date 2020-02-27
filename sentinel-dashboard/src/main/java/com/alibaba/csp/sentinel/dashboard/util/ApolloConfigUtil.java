@@ -13,29 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alibaba.csp.sentinel.dashboard.repository.rule;
-
-import java.util.concurrent.atomic.AtomicLong;
-
-import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.SystemRuleEntity;
-
-import org.springframework.stereotype.Component;
+package com.alibaba.csp.sentinel.dashboard.util;
 
 /**
- * @author leyou
+ * @author hantianwei@gmail.com
+ * @since 1.5.0
  */
-@Component
-public class InMemSystemRuleStore extends InMemoryRuleRepositoryAdapter<SystemRuleEntity> {
+public final class ApolloConfigUtil {
 
-    private static AtomicLong ids = new AtomicLong(0);
+    public static final String FLOW_DATA_ID_POSTFIX = "-flow-rules";
 
-    @Override
-    protected long nextId() {
-        return ids.incrementAndGet();
+    private ApolloConfigUtil() {
     }
 
-    @Override
-    protected void setId(Long id) {
-        ids.set(id);
+    public static String getFlowDataId(String appName) {
+        return String.format("%s%s", appName, FLOW_DATA_ID_POSTFIX);
     }
 }

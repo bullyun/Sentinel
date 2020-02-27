@@ -36,4 +36,9 @@ public class InMemGatewayFlowRuleStore extends InMemoryRuleRepositoryAdapter<Gat
     protected long nextId() {
         return ids.incrementAndGet();
     }
+
+    @Override
+    protected void setId(Long id) {
+        ids.set(id);
+    }
 }

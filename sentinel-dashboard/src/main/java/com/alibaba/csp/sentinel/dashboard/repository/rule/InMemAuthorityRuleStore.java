@@ -36,4 +36,9 @@ public class InMemAuthorityRuleStore extends InMemoryRuleRepositoryAdapter<Autho
     protected long nextId() {
         return ids.incrementAndGet();
     }
+
+    @Override
+    protected void setId(Long id) {
+        ids.set(id);
+    }
 }
