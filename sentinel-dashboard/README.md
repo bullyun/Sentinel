@@ -22,11 +22,21 @@ mvn clean package
 java -Dserver.port=8080 \
 -Dcsp.sentinel.dashboard.server=localhost:8080 \
 -Dproject.name=sentinel-dashboard \
+-Dapollo.portal.ip=localhost \
+-Dapollo.portal.port=8070 \
+-Dapollo.portal.token=token \
+-Dapollo.sentinel.appId=sentinel-dashboard \
+-Dapollo.sentinel.operator=apollo \
+-Dapollo.sentinel.env=DEV \
+-Dapollo.sentinel.cluster=default \
+-Dapollo.sentinel.namespace=application \
 -jar target/sentinel-dashboard.jar
 ```
 
 上述命令中我们指定几个 JVM 参数，其中 `-Dserver.port=8080` 是 Spring Boot 的参数，
-用于指定 Spring Boot 服务端启动端口为 `8080`。其余几个是 Sentinel 客户端的参数。
+用于指定 Spring Boot 服务端启动端口为 `8080`。其余几个是 Sentinel 客户端的参数。apollo 开头的参数是 dashboard 持久化 Apollo 相关配置，
+apollo.portal.ip/port 是Apollo portal 的IP和端口，apollo.portal.token 是 Apollo 开发平台授权管理 apollo.sentinel.appId=sentinel-dashboard
+项目的token。需要主要要提前手动在 Apollo portal 上创建 sentinel-dashboard 项目。apollo.sentinel.operator=apollo 是创建/修改配置的用户名。
 
 为便于演示，我们对控制台本身加入了流量控制功能，具体做法是引入 Sentinel 提供的 `CommonFilter` 这个 Servlet Filter。
 上述 JVM 参数的含义是：
