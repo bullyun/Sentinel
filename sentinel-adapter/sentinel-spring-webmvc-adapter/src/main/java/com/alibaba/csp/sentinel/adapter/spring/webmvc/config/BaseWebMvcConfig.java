@@ -23,7 +23,7 @@ import com.alibaba.csp.sentinel.util.AssertUtil;
  * Common base configuration for Spring Web MVC adapter.
  *
  * @author kaizi2009
- * @since 1.7.1
+ * @since 1.7.1.11
  */
 public abstract class BaseWebMvcConfig {
 

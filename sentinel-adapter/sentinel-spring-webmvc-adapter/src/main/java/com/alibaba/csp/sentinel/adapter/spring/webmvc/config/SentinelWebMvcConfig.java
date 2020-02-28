@@ -19,7 +19,7 @@ import com.alibaba.csp.sentinel.adapter.spring.webmvc.callback.UrlCleaner;
 
 /**
  * @author kaizi2009
- * @since 1.7.1
+ * @since 1.7.1.11
  */
 public class SentinelWebMvcConfig extends BaseWebMvcConfig {
 

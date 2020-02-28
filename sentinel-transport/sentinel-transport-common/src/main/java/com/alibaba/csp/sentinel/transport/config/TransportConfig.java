@@ -103,7 +103,7 @@ public class TransportConfig {
      * is modified, then the API path should also be consistent with the API path of the dashboard.
      *
      * @return the heartbeat api path
-     * @since 1.7.1
+     * @since 1.7.1.11
      */
     public static String getHeartbeatApiPath() {
         String apiPath = SentinelConfig.getConfig(HEARTBEAT_API_PATH);

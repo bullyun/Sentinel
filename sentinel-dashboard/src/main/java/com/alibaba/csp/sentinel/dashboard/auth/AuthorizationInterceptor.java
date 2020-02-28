@@ -31,7 +31,7 @@ import java.lang.reflect.Method;
  * The web interceptor for privilege-based authorization.
  *
  * @author lkxiaolou
- * @since 1.7.1
+ * @since 1.7.1.11
  */
 @Component
 public class AuthorizationInterceptor implements HandlerInterceptor {

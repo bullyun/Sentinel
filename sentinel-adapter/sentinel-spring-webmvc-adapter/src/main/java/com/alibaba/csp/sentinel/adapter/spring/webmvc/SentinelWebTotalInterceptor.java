@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
  * a single resource name (configured in {@link SentinelWebMvcTotalConfig}).
  *
  * @author kaizi2009
- * @since 1.7.1
+ * @since 1.7.1.11
  */
 public class SentinelWebTotalInterceptor extends AbstractSentinelInterceptor {
 
