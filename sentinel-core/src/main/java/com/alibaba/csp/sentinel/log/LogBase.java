@@ -15,6 +15,7 @@
  */
 package com.alibaba.csp.sentinel.log;
 
+import com.alibaba.csp.sentinel.init.InitExecutor;
 import com.alibaba.csp.sentinel.util.PidUtil;
 
 import java.io.File;

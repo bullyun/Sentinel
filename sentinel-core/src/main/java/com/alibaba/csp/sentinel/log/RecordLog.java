@@ -15,6 +15,8 @@
  */
 package com.alibaba.csp.sentinel.log;
 
+import com.alibaba.csp.sentinel.init.InitExecutor;
+
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +33,9 @@ public class RecordLog extends LogBase {
 
     static {
         logHandler = makeLogger(FILE_NAME, heliumRecordLog);
+
+        //提前初始化，避免调用的时候卡顿
+        InitExecutor.doInit();
     }
 
     public static void info(String detail, Object... params) {
